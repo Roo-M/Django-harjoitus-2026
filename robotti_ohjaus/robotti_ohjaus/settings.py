@@ -25,6 +25,9 @@ SECRET_KEY = 'django-insecure-r(@i52nep)ka2gbn8_a_m+8@rt)9xp5^93n1dq&(d$b@5pe&e$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Important: When DEBUG = False, Django requires you to specify the hosts you will allow this Django project to run from.
+# In production, this should be replaced with a proper domain name:
+# ALLOWED_HOSTS = ['yourdomain.com']
 ALLOWED_HOSTS = []
 
 

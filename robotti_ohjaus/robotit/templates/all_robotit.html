@@ -1,0 +1,19 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Robotti varikko - Lista kaikista roboteista
+{% endblock %}
+
+
+{% block content %}
+
+  <p><a href="/">HOME</a></p>
+  
+  <h1>Robotti  </h1>
+  
+  <ul>
+    {% for x in myrobotit %}
+      <li><a href="details/{{ x.id }}">{{ x.robotType }} {{ x.robotModel }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

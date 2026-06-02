@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Details about {{ myrobotit.robotType }} {{ myrobotit.robotModel }}
+{% endblock %}
+
+
+{% block content %}
+  <h1>{{ myrobotit.robotType }} {{ myrobotit.robotModel }}</h1>
+  
+  <p>Number: {{ myrobotit.robotIDnumber }}</p>
+  <p>Robotti since: {{ myrobotit.added_date }}</p>
+  
+  <p>Back to <a href="/robotit">Robotti</a></p>
+  
+{% endblock %}
