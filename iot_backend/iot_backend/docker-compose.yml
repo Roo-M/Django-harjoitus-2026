@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # MQTT Broker Service (Mosquitto)
+  mqtt-broker:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"      # MQTT Port
+      - "9001:9001"      # WebSocket Port 
+    volumes:
+      - ./mosquitto/config:/mosquitto/config      # Custom Mosquitto config
+    environment:
+      - MQTT_USERNAME=admin
+      - MQTT_PASSWORD=admin
+    restart: unless-stopped
