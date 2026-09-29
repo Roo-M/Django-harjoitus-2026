@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', 'robotit',
+    'django.contrib.staticfiles', 
+    'robotit',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
