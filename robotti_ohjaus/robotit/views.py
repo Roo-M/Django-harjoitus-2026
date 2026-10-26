@@ -1,6 +1,7 @@
 from tempfile import template
 
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.template import loader
 
 from rest_framework import viewsets, generics
@@ -14,9 +15,8 @@ def robotit(request):
   return HttpResponse(template.render())
 
 def robotit_list(request):
-   template = loader.get_template('robotit_list.html')
-   robotit = Robotti.objects.all()
-   return HttpResponse(template.render({'robotit': robotit}))
+  robotit = Robotti.objects.all().order_by('modelname')
+  return render(request, 'robotit_list.html', {'robotit': robotit})
 
 class RobottiViewSet(viewsets.ModelViewSet):
     queryset = Robotti.objects.all()

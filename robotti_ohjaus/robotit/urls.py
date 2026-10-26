@@ -6,6 +6,6 @@ router = DefaultRouter()
 router.register(r'robotit', views.RobottiViewSet)
 
 urlpatterns = [
-    #path('robotit/', views.robotit, name='robotit'),
+    path('', views.robotit_list, name='robotit_list'),
     path('', include(router.urls)), 
 ]

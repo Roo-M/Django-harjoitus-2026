@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robottien sijainnit</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #172b32;
+            --muted: #61737a;
+            --line: #dce5e5;
+            --paper: #f4f8f7;
+            --teal: #087f75;
+            --teal-dark: #075d57;
+            --coral: #e66b50;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font: 15px/1.5 "Segoe UI", sans-serif;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 76px;
+            padding: 16px clamp(20px, 5vw, 72px);
+            border-bottom: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 38px;
+            height: 38px;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--teal);
+            color: white;
+            font-size: 20px;
+        }
+
+        .status { color: var(--muted); font-size: 13px; }
+        .status::before {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: var(--teal);
+            content: "";
+        }
+
+        main {
+            width: min(1160px, calc(100% - 40px));
+            margin: 48px auto;
+        }
+
+        .heading { margin-bottom: 28px; }
+        .eyebrow {
+            margin: 0 0 7px;
+            color: var(--teal-dark);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-family: "Trebuchet MS", sans-serif;
+            font-size: clamp(28px, 4vw, 40px);
+            line-height: 1.15;
+        }
+        .subtitle { margin: 9px 0 0; color: var(--muted); }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(230px, 290px) minmax(0, 1fr);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        aside { padding: 22px; border-right: 1px solid var(--line); }
+        .panel-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        h2 { margin: 0; font-size: 16px; }
+        .count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+        .actions { display: flex; gap: 14px; margin-bottom: 14px; }
+        button {
+            padding: 0;
+            border: 0;
+            background: none;
+            color: var(--teal-dark);
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 650;
+        }
+        button:hover { color: var(--coral); }
+        .robot-list { display: grid; gap: 2px; }
+        .robot-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .robot-option:hover { background: var(--paper); }
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 3px 0 0;
+            accent-color: var(--teal);
+        }
+        .robot-name { display: block; font-weight: 650; overflow-wrap: anywhere; }
+        .robot-serial { display: block; color: var(--muted); font-size: 12px; }
+
+        .coordinates { min-width: 0; padding: 22px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        td { padding: 14px 12px; border-bottom: 1px solid #edf1f0; }
+        tbody tr:last-child td { border-bottom: 0; }
+        .coordinate {
+            font-variant-numeric: tabular-nums;
+            font-weight: 650;
+        }
+        .empty {
+            padding: 36px 16px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            main { margin: 30px auto; }
+            .workspace { grid-template-columns: 1fr; }
+            aside { border-right: 0; border-bottom: 1px solid var(--line); }
+            .robot-list { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+            .coordinates { padding: 18px 12px; }
+            th, td { padding: 11px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand"><span class="brand-mark" aria-hidden="true">R</span> Robottien hallinta</div>
+        <div class="status">Sijaintitiedot</div>
+    </header>
+
+    <main>
+        <section class="heading">
+            <p class="eyebrow">Laitekanta</p>
+            <h1>Robottien sijainnit</h1>
+            <p class="subtitle">Valitse näytettävät robotit ja tarkastele niiden koordinaatteja.</p>
+        </section>
+
+        <section class="workspace" aria-label="Robottien valinta ja sijainnit">
+            <aside>
+                <div class="panel-heading">
+                    <h2>Robotit</h2>
+                    <span class="count" id="selection-count" aria-live="polite"></span>
+                </div>
+                <div class="actions">
+                    <button type="button" id="select-all">Valitse kaikki</button>
+                    <button type="button" id="select-none">Tyhjennä</button>
+                </div>
+                <div class="robot-list">
+                    {% for robotti in robotit %}
+                    <label class="robot-option">
+                        <input class="robot-toggle" type="checkbox" value="{{ robotti.id }}" checked>
+                        <span>
+                            <span class="robot-name">{{ robotti.modelname }}</span>
+                            <span class="robot-serial">{{ robotti.serialnumber }}</span>
+                        </span>
+                    </label>
+                    {% empty %}
+                    <p class="subtitle">Robotteja ei ole vielä lisätty.</p>
+                    {% endfor %}
+                </div>
+            </aside>
+
+            <section class="coordinates" aria-labelledby="coordinates-title">
+                <div class="panel-heading">
+                    <h2 id="coordinates-title">Koordinaatit</h2>
+                    <span class="count" id="visible-count"></span>
+                </div>
+                {% if robotit %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Robotti</th><th>Sarjanumero</th><th>X</th><th>Y</th></tr>
+                        </thead>
+                        <tbody id="coordinate-rows">
+                            {% for robotti in robotit %}
+                            <tr data-robot-id="{{ robotti.id }}">
+                                <td class="robot-name">{{ robotti.modelname }}</td>
+                                <td>{{ robotti.serialnumber }}</td>
+                                <td class="coordinate">{{ robotti.location_x|default_if_none:"Ei tiedossa" }}</td>
+                                <td class="coordinate">{{ robotti.location_y|default_if_none:"Ei tiedossa" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="empty" id="no-selection" hidden>Valitse vähintään yksi robotti.</p>
+                {% else %}
+                <p class="empty">Robottien koordinaatit näkyvät täällä, kun niitä on lisätty.</p>
+                {% endif %}
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const toggles = [...document.querySelectorAll('.robot-toggle')];
+        const rows = [...document.querySelectorAll('#coordinate-rows tr')];
+        const selectionCount = document.querySelector('#selection-count');
+        const visibleCount = document.querySelector('#visible-count');
+        const noSelection = document.querySelector('#no-selection');
+
+        function updateRobots() {
+            const selected = new Set(toggles.filter((toggle) => toggle.checked).map((toggle) => toggle.value));
+            let visible = 0;
+            rows.forEach((row) => {
+                row.hidden = !selected.has(row.dataset.robotId);
+                if (!row.hidden) visible += 1;
+            });
+            selectionCount.textContent = `${selected.size} / ${toggles.length} valittu`;
+            visibleCount.textContent = `${visible} näytetään`;
+            if (noSelection) noSelection.hidden = visible > 0;
+        }
+
+        toggles.forEach((toggle) => toggle.addEventListener('change', updateRobots));
+        document.querySelector('#select-all').addEventListener('click', () => {
+            toggles.forEach((toggle) => { toggle.checked = true; });
+            updateRobots();
+        });
+        document.querySelector('#select-none').addEventListener('click', () => {
+            toggles.forEach((toggle) => { toggle.checked = false; });
+            updateRobots();
+        });
+        updateRobots();
+    </script>
+</body>
+</html>
