@@ -150,10 +150,20 @@
             text-transform: uppercase;
         }
         td { padding: 14px 12px; border-bottom: 1px solid #edf1f0; }
-        tbody tr:last-child td { border-bottom: 0; }
+        .robot-separator td {
+            height: 0;
+            padding: 0;
+            border: 0;
+            border-bottom: 3px solid #263238;
+        }
         .coordinate {
             font-variant-numeric: tabular-nums;
             font-weight: 650;
+        }
+        .location-entry + .location-entry {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #edf1f0;
         }
         .empty {
             padding: 36px 16px;
@@ -218,16 +228,29 @@
                 <div class="table-wrap">
                     <table>
                         <thead>
-                            <tr><th>Robotti</th><th>Sarjanumero</th><th>X</th><th>Y</th></tr>
+                            <tr><th>Robotti</th><th>Sarjanumero</th><th>Sijainnit (X, Y)</th></tr>
                         </thead>
                         <tbody id="coordinate-rows">
                             {% for robotti in robotit %}
                             <tr data-robot-id="{{ robotti.id }}">
                                 <td class="robot-name">{{ robotti.modelname }}</td>
                                 <td>{{ robotti.serialnumber }}</td>
-                                <td class="coordinate">{{ robotti.location_x|default_if_none:"Ei tiedossa" }}</td>
-                                <td class="coordinate">{{ robotti.location_y|default_if_none:"Ei tiedossa" }}</td>
+                                <td class="coordinate">
+                                    {% for location in robotti.locations.all %}
+                                    <div class="location-entry">
+                                        ({{ location.location_x|default_if_none:"Ei tiedossa" }},
+                                        {{ location.location_y|default_if_none:"Ei tiedossa" }})
+                                    </div>
+                                    {% empty %}
+                                    Ei tiedossa
+                                    {% endfor %}
+                                </td>
                             </tr>
+                            {% if not forloop.last %}
+                            <tr class="robot-separator" aria-hidden="true">
+                                <td colspan="3"></td>
+                            </tr>
+                            {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -242,7 +265,7 @@
 
     <script>
         const toggles = [...document.querySelectorAll('.robot-toggle')];
-        const rows = [...document.querySelectorAll('#coordinate-rows tr')];
+        const rows = [...document.querySelectorAll('#coordinate-rows tr[data-robot-id]')];
         const selectionCount = document.querySelector('#selection-count');
         const visibleCount = document.querySelector('#visible-count');
         const noSelection = document.querySelector('#no-selection');
@@ -252,6 +275,10 @@
             let visible = 0;
             rows.forEach((row) => {
                 row.hidden = !selected.has(row.dataset.robotId);
+                const separator = row.nextElementSibling;
+                if (separator && separator.classList.contains('robot-separator')) {
+                    separator.hidden = row.hidden;
+                }
                 if (!row.hidden) visible += 1;
             });
             selectionCount.textContent = `${selected.size} / ${toggles.length} valittu`;
