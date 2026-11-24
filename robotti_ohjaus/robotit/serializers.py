@@ -19,13 +19,24 @@ class RobottiSerializer(serializers.ModelSerializer):
         fields = ['id', 'modelname', 'serialnumber', 'location_x', 'location_y', 'locations']
         validators = []
 
+    def _should_create_location(self, robotti, location_x, location_y):
+        if location_x is None and location_y is None:
+            return False
+
+        if location_x == 0 and location_y == 0:
+            latest_location = robotti.locations.order_by('-pk').first()
+            if latest_location and latest_location.location_x == 0 and latest_location.location_y == 0:
+                return False
+
+        return True
+
     @transaction.atomic
     def create(self, validated_data):
         location_x = validated_data.pop('location_x', None)
         location_y = validated_data.pop('location_y', None)
         robotti, _ = Robotti.objects.get_or_create(**validated_data)
 
-        if location_x is not None or location_y is not None:
+        if self._should_create_location(robotti, location_x, location_y):
             Location.objects.create(
                 robotti=robotti,
                 location_x=location_x,
@@ -40,7 +51,7 @@ class RobottiSerializer(serializers.ModelSerializer):
         location_y = validated_data.pop('location_y', None)
         instance = super().update(instance, validated_data)
 
-        if location_x is not None or location_y is not None:
+        if self._should_create_location(instance, location_x, location_y):
             Location.objects.create(
                 robotti=instance,
                 location_x=location_x,

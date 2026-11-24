@@ -56,3 +56,39 @@ class RobottiSerializerTests(TestCase):
 		self.assertEqual(Robotti.objects.count(), 1)
 		self.assertEqual(original_robot.pk, duplicate_robot.pk)
 		self.assertEqual(duplicate_robot.locations.count(), 2)
+
+	def test_consecutive_zero_coordinates_are_not_added(self):
+		first = RobottiSerializer(data={
+			'modelname': 'Testirobotti',
+			'serialnumber': 'TEST-ZERO',
+			'location_x': 0,
+			'location_y': 0,
+		})
+		self.assertTrue(first.is_valid(), first.errors)
+		robot = first.save()
+
+		second = RobottiSerializer(data={
+			'modelname': 'Testirobotti',
+			'serialnumber': 'TEST-ZERO',
+			'location_x': 0,
+			'location_y': 0,
+		})
+		self.assertTrue(second.is_valid(), second.errors)
+		second.save()
+
+		self.assertEqual(robot.locations.count(), 1)
+
+	def test_zero_coordinates_after_a_nonzero_location_are_added(self):
+		robot = Robotti.objects.create(modelname='Testirobotti', serialnumber='TEST-ZERO-2')
+		Location.objects.create(robotti=robot, location_x=1, location_y=2)
+
+		serializer = RobottiSerializer(robot, data={
+			'modelname': 'Testirobotti',
+			'serialnumber': 'TEST-ZERO-2',
+			'location_x': 0,
+			'location_y': 0,
+		})
+		self.assertTrue(serializer.is_valid(), serializer.errors)
+		serializer.save()
+
+		self.assertEqual(robot.locations.count(), 2)
