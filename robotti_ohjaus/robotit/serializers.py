@@ -23,10 +23,13 @@ class RobottiSerializer(serializers.ModelSerializer):
         if location_x is None and location_y is None:
             return False
 
-        if location_x == 0 and location_y == 0:
-            latest_location = robotti.locations.order_by('-pk').first()
-            if latest_location and latest_location.location_x == 0 and latest_location.location_y == 0:
-                return False
+        latest_location = robotti.locations.order_by('-pk').first()
+        if (
+            latest_location
+            and latest_location.location_x == location_x
+            and latest_location.location_y == location_y
+        ):
+            return False
 
         return True
 

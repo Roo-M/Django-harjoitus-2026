@@ -78,6 +78,27 @@ class RobottiSerializerTests(TestCase):
 
 		self.assertEqual(robot.locations.count(), 1)
 
+	def test_consecutive_identical_coordinates_are_not_added(self):
+		first = RobottiSerializer(data={
+			'modelname': 'Testirobotti',
+			'serialnumber': 'TEST-DUPLICATE-COORDINATES',
+			'location_x': 12.5,
+			'location_y': -4.25,
+		})
+		self.assertTrue(first.is_valid(), first.errors)
+		robot = first.save()
+
+		second = RobottiSerializer(data={
+			'modelname': 'Testirobotti',
+			'serialnumber': 'TEST-DUPLICATE-COORDINATES',
+			'location_x': 12.5,
+			'location_y': -4.25,
+		})
+		self.assertTrue(second.is_valid(), second.errors)
+		second.save()
+
+		self.assertEqual(robot.locations.count(), 1)
+
 	def test_zero_coordinates_after_a_nonzero_location_are_added(self):
 		robot = Robotti.objects.create(modelname='Testirobotti', serialnumber='TEST-ZERO-2')
 		Location.objects.create(robotti=robot, location_x=1, location_y=2)
